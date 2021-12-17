@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:e_linphone/e_linphone.dart';
 import 'package:flutter/material.dart';
@@ -22,19 +23,19 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       navigatorKey: _navigatorKey,
-      onGenerateRoute: (settings) => HomePage.route(),
+      onGenerateRoute: (settings) => SignInPage.route(),
     );
   }
 }
 
-class HomePage extends StatefulWidget {
-  static Route route() => MaterialPageRoute(builder: (context) => HomePage());
+class SignInPage extends StatefulWidget {
+  static Route route() => MaterialPageRoute(builder: (context) => SignInPage());
 
   @override
-  State<StatefulWidget> createState() => HomePageState();
+  State<StatefulWidget> createState() => SignInPageState();
 }
 
-class HomePageState extends State<HomePage> {
+class SignInPageState extends State<SignInPage> {
   final GlobalKey<FormState> _formKey = GlobalKey();
 
   late SharedPreferences _sharedPreferences;
@@ -85,9 +86,10 @@ class HomePageState extends State<HomePage> {
             password: _password,
             domain: _domain)
         .then((value) {
-      print('login success : $value');
+      Navigator.of(context).push(HomePage.route());
     }).onError((error, stackTrace) {
-      print('login failure : $error');
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('$error')));
     });
   }
 
@@ -142,6 +144,42 @@ class HomePageState extends State<HomePage> {
           child: Padding(
             padding: EdgeInsets.all(12),
             child: body,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class HomePage extends StatefulWidget {
+  static Route route() => MaterialPageRoute(builder: (context) => HomePage());
+
+  @override
+  State<StatefulWidget> createState() => HomePageState();
+}
+
+class HomePageState extends State<HomePage> {
+  String _uri = '';
+
+  @override
+  Widget build(BuildContext context) {
+    final uri = TextFormField(
+      initialValue: _uri,
+      onChanged: (value) => _uri = value,
+    );
+
+    final call = ElevatedButton(
+      child: Text('Call'),
+      onPressed: () => ELinphone.call(uri: _uri)
+          .onError((error, stackTrace) => log('error $error')),
+    );
+
+    return Scaffold(
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Wrap(
+            runSpacing: 12,
+            children: [uri, call],
           ),
         ),
       ),

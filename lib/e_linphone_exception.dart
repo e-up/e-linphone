@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/services.dart';
 
-enum ELinphoneExceptionCode { LOGIN_FAILURE }
+enum ELinphoneExceptionCode { LOGIN_FAILURE, CALL_FAILURE }
 
 class ELinphoneException {
   final ELinphoneExceptionCode? code;
@@ -25,6 +25,8 @@ extension ToELinphoneExceptionCode on String {
     switch (this) {
       case "1":
         return ELinphoneExceptionCode.LOGIN_FAILURE;
+      case "2":
+        return ELinphoneExceptionCode.CALL_FAILURE;
     }
     return null;
   }

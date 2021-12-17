@@ -56,6 +56,12 @@ class ELinphone {
         throw error.toELinphoneException());
   }
 
+  static Future<void> call({required String uri}) {
+    return _methodChannel.invokeMethod('call', {'sipUri': uri}).onError(
+        (PlatformException error, stackTrace) =>
+            throw error.toELinphoneException());
+  }
+
   static void release() {
     _subscription?.cancel();
     _controller.close();

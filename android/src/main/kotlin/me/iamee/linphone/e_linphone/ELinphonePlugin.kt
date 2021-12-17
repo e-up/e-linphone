@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.annotation.NonNull
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.ObjectMapper
-
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodCall
@@ -14,7 +13,6 @@ import io.flutter.plugin.common.MethodChannel.Result
 import me.iamee.linphone.e_linphone.model.ELinphoneAccount
 import org.linphone.core.*
 import java.util.*
-import kotlin.collections.HashMap
 
 /** ELinphonePlugin */
 class ELinphonePlugin : FlutterPlugin, MethodCallHandler, EventChannel.StreamHandler {
@@ -71,6 +69,8 @@ class ELinphonePlugin : FlutterPlugin, MethodCallHandler, EventChannel.StreamHan
             result.success("Android ${android.os.Build.VERSION.RELEASE}")
         } else if (call.method == "login") {
             login(call, result)
+        } else if (call.method == "call") {
+            call(call, result)
         }
     }
 
@@ -146,6 +146,19 @@ class ELinphonePlugin : FlutterPlugin, MethodCallHandler, EventChannel.StreamHan
             core.defaultAccount = coreAccount
         }
         core.start()
+    }
+
+    private fun call(call: MethodCall, result: Result) {
+        val sipUri: String? = call.argument<String>("sipUri")
+        sipUri ?: return result.error("${ELinphoneException.CALL_FAILURE.code}", "请提供SIP地址", null)
+        val address = Factory.instance().createAddress(sipUri)
+        address ?: return result.error("${ELinphoneException.CALL_FAILURE.code}", "创建远程地址失败", null)
+
+        val params = core.createCallParams(null)
+        params ?: return result.error("${ELinphoneException.CALL_FAILURE.code}", "参数错误", null)
+        params.mediaEncryption = MediaEncryption.None
+
+        core.inviteAddressWithParams(address, params)
     }
 
     override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
