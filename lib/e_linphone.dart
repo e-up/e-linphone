@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:e_linphone/e_linphone_exception.dart';
 import 'package:flutter/services.dart';
 
 import 'transport.dart';
@@ -31,7 +32,7 @@ class ELinphone {
     return version;
   }
 
-  static Future<void> login(
+  static Future<String?> login(
       {required String uri,
       required String username,
       required String password,
@@ -41,7 +42,7 @@ class ELinphone {
       String? ha1,
       String? relam,
       String? algorithm}) {
-    return _methodChannel.invokeMethod('login', {
+    return _methodChannel.invokeMethod<String>('login', {
       'uri': uri,
       'username': username,
       'password': password,
@@ -51,7 +52,8 @@ class ELinphone {
       'ha1': ha1,
       'realm': relam,
       'algorithm': algorithm
-    });
+    }).onError((PlatformException error, stackTrace) =>
+        throw error.toELinphoneException());
   }
 
   static void release() {

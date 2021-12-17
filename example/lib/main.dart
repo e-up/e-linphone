@@ -80,7 +80,15 @@ class HomePageState extends State<HomePage> {
     _sharedPreferences.setString(_cachePasswordKey, _password);
     _sharedPreferences.setString(_cacheDomainKey, _domain);
     ELinphone.login(
-        uri: _uri, username: _username, password: _password, domain: _domain);
+            uri: _uri,
+            username: _username,
+            password: _password,
+            domain: _domain)
+        .then((value) {
+      print('login success : $value');
+    }).onError((error, stackTrace) {
+      print('login failure : $error');
+    });
   }
 
   @override

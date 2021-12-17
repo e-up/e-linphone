@@ -19,7 +19,11 @@ rootProject.allprojects {
         google()
         jcenter()
         maven {
-            url "https://linphone.org/maven_repository"
+            name "linphone.org maven repository"
+            url "https://linphone.org/maven_repository/"
+            content {
+                includeGroup "org.linphone"
+            }
         }
     }
 }
@@ -41,5 +45,9 @@ android {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     // Latest version is 5.0.x, using + to get the latest available
-    implementation 'org.linphone:linphone-sdk-android:5.0+'
+    debugImplementation "org.linphone:linphone-sdk-android-debug:5.0+"
+    releaseImplementation "org.linphone:linphone-sdk-android:5.0+"
+    // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.2'
+
 }
