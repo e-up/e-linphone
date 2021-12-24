@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:e_linphone/e_linphone_exception.dart';
 import 'package:flutter/services.dart';
@@ -20,7 +21,7 @@ class ELinphone {
       _subscription = const EventChannel('e_linphone_event')
           .receiveBroadcastStream()
           .listen((event) {
-        _controller.add(event);
+        _controller.add(jsonDecode(event));
       });
     }
     return _controller.stream;
@@ -62,8 +63,14 @@ class ELinphone {
             throw error.toELinphoneException());
   }
 
+  static Future<void> terminate(){
+    return _methodChannel.invokeMethod('terminate');
+  }
+
   static void release() {
     _subscription?.cancel();
     _controller.close();
   }
+
+
 }

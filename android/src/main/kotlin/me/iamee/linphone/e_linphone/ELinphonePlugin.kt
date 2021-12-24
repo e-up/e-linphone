@@ -71,6 +71,8 @@ class ELinphonePlugin : FlutterPlugin, MethodCallHandler, EventChannel.StreamHan
             login(call, result)
         } else if (call.method == "call") {
             call(call, result)
+        } else if (call.method == "terminate") {
+            terminate(call, result)
         }
     }
 
@@ -152,13 +154,22 @@ class ELinphonePlugin : FlutterPlugin, MethodCallHandler, EventChannel.StreamHan
         val sipUri: String? = call.argument<String>("sipUri")
         sipUri ?: return result.error("${ELinphoneException.CALL_FAILURE.code}", "请提供SIP地址", null)
         val address = Factory.instance().createAddress(sipUri)
-        address ?: return result.error("${ELinphoneException.CALL_FAILURE.code}", "创建远程地址失败", null)
 
+        address ?: return result.error("${ELinphoneException.CALL_FAILURE.code}", "创建远程地址失败", null)
+        address.domain = "47.95.212.220"
+        address.port = 56000
         val params = core.createCallParams(null)
         params ?: return result.error("${ELinphoneException.CALL_FAILURE.code}", "参数错误", null)
         params.mediaEncryption = MediaEncryption.None
-
+        params.proxyConfig = core.defaultProxyConfig
         core.inviteAddressWithParams(address, params)
+        core.inviteAddress(address)
+        result.success(null)
+    }
+
+    private fun terminate(call: MethodCall, result: Result) {
+        core.currentCall?.terminate()
+        result.success(null)
     }
 
     override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {

@@ -32,6 +32,13 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+
+       <!-- The following isn't mandatory but having a foreground service prevents Android to kill the app during a call -->
+       <!-- You can create your own service that inherits from this class for simplicity or handle the foreground service yourself -->
+       <service android:name="org.linphone.core.tools.service.CoreService"
+                android:foregroundServiceType="phoneCall|camera|microphone"
+                android:stopWithTask="false" />
+
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data
